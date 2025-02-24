@@ -4,6 +4,7 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router";
 import App from "./app.tsx";
 import { AuthContextProvider } from "./auth/auth-context.tsx";
 import "./index.css";
@@ -77,10 +78,12 @@ export const ThemeWrapper = ({
 createRoot(document.getElementById("root")!).render(
   <ThemeWrapper>
     <CssBaseline />
-    <AuthContextProvider auth={auth}>
-      <DbContext.Provider value={db}>
-        <App />
-      </DbContext.Provider>
-    </AuthContextProvider>
+    <BrowserRouter>
+      <AuthContextProvider auth={auth}>
+        <DbContext.Provider value={db}>
+          <App />
+        </DbContext.Provider>
+      </AuthContextProvider>
+    </BrowserRouter>
   </ThemeWrapper>
 );

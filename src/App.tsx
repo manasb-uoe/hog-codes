@@ -9,7 +9,10 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useCallback } from "react";
+import { Link, Route, Routes } from "react-router";
 import { useAuthContext } from "./auth/auth-context";
+import { Home } from "./home";
+import { ProblemsList } from "./problems-list";
 
 function App() {
   const authContext = useAuthContext();
@@ -30,14 +33,11 @@ function App() {
           >
             <SavingsIcon />
           </IconButton>
-          <Typography
-            variant="h6"
-            color="inherit"
-            component="div"
-            sx={{ flexGrow: 1 }}
-          >
-            Hog Codes
-          </Typography>
+          <Link to="/" className="flex-grow-1">
+            <Typography variant="h6" color="inherit" component="div">
+              Hog Codes
+            </Typography>
+          </Link>
           <div>
             <IconButton
               size="small"
@@ -71,7 +71,12 @@ function App() {
           </div>
         </Toolbar>
       </AppBar>
-      <div className="flex-grow">{authContext.user.email}</div>
+      <div className="flex-grow p-4">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/problems/:category" element={<ProblemsList />} />
+        </Routes>
+      </div>
     </div>
   );
 }
