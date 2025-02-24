@@ -11,8 +11,9 @@ import {
 import React, { useCallback } from "react";
 import { Link, Navigate, Route, Routes } from "react-router";
 import { useAuthContext } from "./auth/auth-context";
-import { ProblemsList } from "./problems-list";
+import { ProblemsListPage } from "./pages/problems-list-page";
 import { problemCategories } from "./types";
+import { ProblemPage } from "./pages/problem-page";
 
 function App() {
   const authContext = useAuthContext();
@@ -22,7 +23,7 @@ function App() {
   }, []);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col h-full">
       <AppBar position="sticky">
         <Toolbar variant="dense">
           <div className="flex-grow-1 flex items-center">
@@ -43,7 +44,7 @@ function App() {
               {problemCategories.map((cat) => (
                 <Link key={cat} to={`/problems/${cat}`}>
                   <MenuItem dense>
-                    <Typography className="uppercase" fontSize={"small"}>
+                    <Typography className="uppercase" fontSize={12}>
                       {cat}
                     </Typography>
                   </MenuItem>
@@ -84,9 +85,14 @@ function App() {
           </div>
         </Toolbar>
       </AppBar>
-      <div className="flex-grow p-4">
+      <div className="flex-grow p-4 ">
         <Routes>
-          <Route path="/problems/:category" element={<ProblemsList />} />
+          <Route path="/problems/:category" element={<ProblemsListPage />} />
+          <Route path="/problems/:category" element={<ProblemsListPage />} />
+          <Route
+            path="/problems/:category/:problemId"
+            element={<ProblemPage />}
+          />
           <Route path="*" element={<Navigate to="/problems/JavaScript" />} />
         </Routes>
       </div>

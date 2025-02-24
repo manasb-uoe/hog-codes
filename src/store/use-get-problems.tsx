@@ -17,7 +17,10 @@ export const useGetProblems = (category: IProblemCategory) => {
     const collectionRef = collection(db, "problems");
     getDocs(query(collectionRef, where("category", "==", category)))
       .then((snapshot) => {
-        const problems = snapshot.docs.map((doc) => doc.data());
+        const problems = snapshot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }));
         setData(problems as IProblem[]);
       })
       .catch((err: unknown) => {

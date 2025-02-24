@@ -38,11 +38,11 @@ export const AuthContextProvider = ({
         setLoading(false);
       }
     });
-  }, []);
+  }, [auth]);
 
   const logout = useCallback(async () => {
     return await signOut(auth);
-  }, []);
+  }, [auth]);
 
   const onLoginSuccess = useCallback((user: User) => {
     setUser(user);

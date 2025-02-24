@@ -1,7 +1,6 @@
 import CodeIcon from "@mui/icons-material/Code";
 import {
   Alert,
-  Chip,
   CircularProgress,
   List,
   ListItem,
@@ -9,41 +8,34 @@ import {
   ListItemText,
   Typography,
 } from "@mui/material";
-import { useParams } from "react-router";
-import { useGetProblems } from "./store/use-get-problems";
-import { IProblem, IProblemCategory } from "./types";
+import { Link, useParams } from "react-router";
+import { DifficultyChip } from "../components/difficulty-chip";
+import { TagChip } from "../components/tag-chip";
+import { useGetProblems } from "../store/use-get-problems";
+import { IProblem, IProblemCategory } from "../types";
 
 const Problem = ({ problem }: { problem: IProblem }) => {
   return (
-    <ListItem>
-      <ListItemIcon>
+    <ListItem classes={{ root: "!py-0 !px-2" }}>
+      <ListItemIcon classes={{ root: "!min-w-[40px]" }}>
         <CodeIcon fontSize="small" />
       </ListItemIcon>
       <ListItemText>
         <div className="flex gap-2">
-          <Typography variant="body1">{problem.title}</Typography>
+          <Link to={problem.id}>
+            <Typography variant="body1">{problem.title}</Typography>
+          </Link>
           {problem.tags.map((tag) => (
-            <Chip key={tag} variant="filled" size="small" label={tag} />
+            <TagChip key={tag} tag={tag} />
           ))}
-          <Chip
-            size="small"
-            variant="filled"
-            color={
-              problem.difficulty === "easy"
-                ? "success"
-                : problem.difficulty === "medium"
-                ? "warning"
-                : "error"
-            }
-            label={problem.difficulty}
-          />
+          <DifficultyChip difficulty={problem.difficulty} />
         </div>
       </ListItemText>
     </ListItem>
   );
 };
 
-export const ProblemsList = () => {
+export const ProblemsListPage = () => {
   const { category } = useParams<{ category: IProblemCategory }>();
 
   if (!category) throw new Error("Category cannot be undefined!");
@@ -68,7 +60,9 @@ export const ProblemsList = () => {
 
   return (
     <div>
-      <Typography variant={"h5"}>{category} Problems</Typography>
+      <Typography variant={"h5"}>
+        {category} Problems ({problems.data.length})
+      </Typography>
       <List>
         {problems.data?.map((problem) => (
           <Problem problem={problem} key={problem.id} />
