@@ -9,10 +9,10 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useCallback } from "react";
-import { Link, Route, Routes } from "react-router";
+import { Link, Navigate, Route, Routes } from "react-router";
 import { useAuthContext } from "./auth/auth-context";
-import { Home } from "./home";
 import { ProblemsList } from "./problems-list";
+import { problemCategories } from "./types";
 
 function App() {
   const authContext = useAuthContext();
@@ -25,19 +25,32 @@ function App() {
     <div className="flex flex-col">
       <AppBar position="sticky">
         <Toolbar variant="dense">
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            sx={{ mr: 2 }}
-          >
-            <SavingsIcon />
-          </IconButton>
-          <Link to="/" className="flex-grow-1">
-            <Typography variant="h6" color="inherit" component="div">
-              Hog Codes
-            </Typography>
-          </Link>
+          <div className="flex-grow-1 flex items-center">
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              sx={{ mr: 2 }}
+            >
+              <SavingsIcon />
+            </IconButton>
+            <Link to="/">
+              <Typography variant="h6" color="inherit" component="div">
+                Hog Codes
+              </Typography>
+            </Link>
+            <div className="ml-4 flex">
+              {problemCategories.map((cat) => (
+                <Link key={cat} to={`/problems/${cat}`}>
+                  <MenuItem dense>
+                    <Typography className="uppercase" fontSize={"small"}>
+                      {cat}
+                    </Typography>
+                  </MenuItem>
+                </Link>
+              ))}
+            </div>
+          </div>
           <div>
             <IconButton
               size="small"
@@ -73,8 +86,8 @@ function App() {
       </AppBar>
       <div className="flex-grow p-4">
         <Routes>
-          <Route path="/" element={<Home />} />
           <Route path="/problems/:category" element={<ProblemsList />} />
+          <Route path="*" element={<Navigate to="/problems/JavaScript" />} />
         </Routes>
       </div>
     </div>

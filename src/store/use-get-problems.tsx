@@ -26,7 +26,7 @@ export const useGetProblems = (category: IProblemCategory) => {
       .finally(() => {
         setLoading(false);
       });
-  }, [db]);
+  }, [db, category]);
 
   return { data, error, loading };
 };
