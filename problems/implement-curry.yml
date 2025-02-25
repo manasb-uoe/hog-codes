@@ -1,0 +1,29 @@
+title: Implement curry()
+description: |
+  Implement a function `curry` that takes a function `f` and returns a curried version of `f`. The curried version of `f` should take a single argument and return a new function that takes the next argument, and so on, until all arguments are provided. Once all arguments are provided, the original function `f` should be called with those arguments and the result returned.
+
+  &nbsp;
+
+  Here is an example:
+
+  &nbsp;
+
+  ```javascript
+  const join = (a, b, c) => {
+   return `${a}_${b}_${c}`
+  }
+  const curriedJoin = curry(join)
+  curriedJoin(1, 2, 3) // '1_2_3'
+  curriedJoin(1)(2, 3) // '1_2_3'
+  curriedJoin(1, 2)(3) // '1_2_3'
+  ```
+
+  &nbsp;
+
+  More to read:
+
+  - https://javascript.info/currying-partials
+  - https://lodash.com/docs/4.17.15#curry
+category: JavaScript
+tags: []
+difficulty: easy

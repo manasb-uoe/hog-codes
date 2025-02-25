@@ -2,6 +2,7 @@ import { Link } from "@mui/material";
 import Markdown from "react-markdown";
 import { Prism } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
 
 export const MarkdownRenderer = ({
@@ -9,7 +10,7 @@ export const MarkdownRenderer = ({
 }: React.PropsWithChildren<unknown>) => {
   return (
     <Markdown
-      remarkPlugins={[remarkGfm]}
+      remarkPlugins={[remarkGfm, remarkBreaks]}
       children={children as string}
       components={{
         ol: ({ children, ...props }) => (

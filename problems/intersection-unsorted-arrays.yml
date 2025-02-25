@@ -1,0 +1,11 @@
+title: Intersection of two unsorted arrays
+description: |
+  Given 2 sorted array of integers, find the elements that exist in both arrays. 
+  &nbsp;
+
+  1. The arrays might have duplicate numbers.
+  1. The order of returning result doesn't matter. 
+  1. What is the **time** & **space** cost of your approach? Could you improve it?"
+category: JavaScript
+tags: [array]
+difficulty: easy

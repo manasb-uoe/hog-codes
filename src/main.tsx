@@ -53,77 +53,15 @@ export const ThemeWrapper = ({
   return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
 };
 
-// await addProblem(
-//   {
-//     title: "Intersection of unsorted arrays",
-//     description: `
-// Given 2 sorted array of integers, find the elements that exist in both arrays.
-
-// \`\`\`javascript
-// intersect(
-//   [1,2,2,3,4,4],q
-//   [2,2,4,5,5,6,2000]
-// )
-// \`\`\`
-
-// 1. The arrays might have duplicate numbers.
-// 1. The order of returning result doesn't matter.
-// 1. What is the **time** & **space** cost of your approach? Could you improve it?
-// `,
-//     category: "JavaScript",
-//     createdAt: Timestamp.now(),
-//     difficulty: "easy",
-//     tags: ["Array"],
-//     testCases: [],
-//   } as Omit<IProblem, "id">,
-//   db
-// );
-
-// await addProblem(
-//   {
-//     title: "Implement curry()",
-//     description: `
-// Currying is a useful technique used in JavaScript applications.
-
-// &nbsp;  
-
-// Please implement a \`curry()\` function, which accepts a function and return a curried one.
-// &nbsp;  
-// Here is an example: 
-
-// \`\`\`javascript
-// const join = (a, b, c) => {
-//    return \`\${a}_\${b}_\${c}\`
-// }
-// const curriedJoin = curry(join)
-// curriedJoin(1, 2, 3) // '1_2_3'
-// curriedJoin(1)(2, 3) // '1_2_3'
-// curriedJoin(1, 2)(3) // '1_2_3'
-// \`\`\`
-
-// More to read:
-
-// - https://javascript.info/currying-partials
-// - https://lodash.com/docs/4.17.15#curry
-// `,
-//     category: "JavaScript",
-//     createdAt: Timestamp.now(),
-//     difficulty: "easy",
-//     tags: ["Array"],
-//     testCases: [],
-//   } as Omit<IProblem, "id">,
-//   db
-// );
-
 createRoot(document.getElementById("root")!).render(
   <ThemeWrapper>
     <CssBaseline />
     <BrowserRouter>
-      <AuthContextProvider auth={auth}>
-        <DbContext.Provider value={db}>
+      <DbContext.Provider value={db}>
+        <AuthContextProvider auth={auth}>
           <App />
-        </DbContext.Provider>
-      </AuthContextProvider>
+        </AuthContextProvider>
+      </DbContext.Provider>
     </BrowserRouter>
   </ThemeWrapper>
 );
