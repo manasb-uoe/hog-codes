@@ -1,16 +1,21 @@
+import crypto from "crypto";
 import { initializeApp } from "firebase/app";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import {
-  addDoc,
   collection,
   deleteDoc,
+  doc,
+  getDoc,
   getDocs,
   getFirestore,
+  setDoc,
   Timestamp,
+  updateDoc,
 } from "firebase/firestore";
 import { readdirSync, readFileSync } from "fs";
 import path from "path";
 import { parse } from "yaml";
+
 const problemsDir = path.join(process.cwd(), "problems");
 const problems = readdirSync(problemsDir);
 
@@ -36,24 +41,49 @@ const auth = getAuth(app);
 
 await signInWithEmailAndPassword(auth, adminUsername, adminPassword);
 
-// delete all problems before adding new ones
-const all = await getDocs(collection(db, "problems"));
-for (const doc of all.docs) {
-  await deleteDoc(doc.ref);
+async function deleteAllProblems() {
+  const all = await getDocs(collection(db, "problems"));
+  for (const doc of all.docs) {
+    await deleteDoc(doc.ref);
+  }
+  console.log("Deleted all problems! Now adding new ones... ");
 }
-console.log("Deleted all problems! Now adding new ones... ");
 
-for (const problemPath of problems) {
+function generateProblemId(title) {
+  return crypto
+    .createHash("shake256", { outputLength: 3 })
+    .update(title)
+    .digest("hex");
+}
+
+async function upsertProblem(parsedProblem) {
+  const id = generateProblemId(parsedProblem.title);
+  const docRef = doc(db, "problems", id);
+
+  try {
+    const exists = (await getDoc(docRef)).exists();
+
+    if (exists) {
+      await updateDoc(docRef, parsedProblem);
+      console.log(`Document updated: ${parsedProblem.title} ✅`);
+    } else {
+      await setDoc(docRef, { ...parsedProblem, createdAt: Timestamp.now() });
+      console.log(`Document added: ${parsedProblem.title} ✅`);
+    }
+  } catch (e) {
+    console.error(`Failed to upsert problem: ${parsedProblem.title}`);
+  }
+}
+
+const promises = problems.map((problemPath) => {
   const infoContents = readFileSync(
     path.join(problemsDir, problemPath),
     "utf-8"
   );
   const parsed = parse(infoContents);
-  await addDoc(collection(db, "problems"), {
-    ...parsed,
-    createdAt: Timestamp.now(),
-  });
-  console.log(`Document written: ${parsed.title} ✅`);
-}
+  return upsertProblem(parsed);
+});
+
+await Promise.all(promises);
 
 process.exit(0);
