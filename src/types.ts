@@ -11,6 +11,11 @@ export interface ITestCase {
   spec: string;
 }
 
+export interface IFile {
+  name: string;
+  content: string;
+}
+
 export interface IProblem {
   id: string;
   title: string;
@@ -18,6 +23,6 @@ export interface IProblem {
   category: IProblemCategory;
   tags: string[];
   difficulty: TProblemDifficulty;
-  testCases: ITestCase[];
   createdAt: Firestore.Timestamp;
+  files: IFile[];
 }

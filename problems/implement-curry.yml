@@ -27,3 +27,49 @@ description: |
 category: JavaScript
 tags: []
 difficulty: easy
+files:
+  - name: index.js
+    content: |
+      /**
+      * @param { (...args: any[]) => any } fn
+      * @returns { (...args: any[]) => any }
+      */
+      export function curry(fn) {
+        // your code here
+      }
+
+  - name: index.test.js
+    content: |
+      import { curry } from './index';
+
+      describe("curry", () => {
+      test("should return the correct result when called with all arguments at once", () => {
+        const add = (a, b, c) => a + b + c;
+        const curriedAdd = curry(add);
+        expect(curriedAdd(1, 2, 3)).toBe(6);
+      });
+
+      test("should return the correct result when called one argument at a time", () => {
+        const multiply = (a, b, c) => a * b * c;
+        const curriedMultiply = curry(multiply);
+        expect(curriedMultiply(2)(3)(4)).toBe(24);
+      });
+
+      test("should return the correct result when called with partial arguments", () => {
+        const subtract = (a, b, c) => a - b - c;
+        const curriedSubtract = curry(subtract);
+        expect(curriedSubtract(10)(5, 2)).toBe(3);
+      });
+
+      test("should handle functions with a single parameter", () => {
+        const identity = (x) => x;
+        const curriedIdentity = curry(identity);
+        expect(curriedIdentity(42)).toBe(42);
+      });
+
+      test("should return a function when not all arguments are provided", () => {
+        const divide = (a, b) => a / b;
+        const curriedDivide = curry(divide);
+        expect(typeof curriedDivide(10)).toBe("function");
+        });
+      });
