@@ -16,7 +16,7 @@ import { MarkdownRenderer } from "../components/markdown-renderer";
 import { TagChip } from "../components/tag-chip";
 import { useGetProblem } from "../store/use-get-problem";
 
-function CodingEnv() {
+function EditorWithTests() {
   const { code, updateCode } = useActiveCode();
   const { sandpack } = useSandpack();
   const theme = useTheme();
@@ -29,14 +29,14 @@ function CodingEnv() {
           <Editor
             width="100%"
             language="javascript"
-            theme="vs-dark"
+            theme={theme.palette.mode === "dark" ? "vs-dark" : "vs-light"}
             key={sandpack.activeFile}
             defaultValue={code}
             onChange={(value) => updateCode(value || "")}
           />
         </Panel>
         <PanelResizeHandle
-          style={{ backgroundColor: theme.palette.divider }}
+          className="h-[1px]"
           hitAreaMargins={{ coarse: 25, fine: 15 }}
         />
         <Panel>
@@ -52,7 +52,6 @@ function CodingEnv() {
 
 const Problem = ({ id }: { id: string }) => {
   const problem = useGetProblem(id);
-  const theme = useTheme();
 
   if (problem.loading) {
     return <CircularProgress size={"small"} />;
@@ -66,7 +65,7 @@ const Problem = ({ id }: { id: string }) => {
 
   return (
     <PanelGroup direction="horizontal">
-      <Panel defaultSize={50}>
+      <Panel defaultSize={30}>
         <div className="flex flex-col gap-1">
           <Typography variant="h6">{problem.data?.title}</Typography>
           <div className="flex gap-2">
@@ -82,7 +81,6 @@ const Problem = ({ id }: { id: string }) => {
       </Panel>
       <PanelResizeHandle
         className="w-[2px] mx-4"
-        style={{ backgroundColor: theme.palette.divider }}
         hitAreaMargins={{ coarse: 25, fine: 15 }}
       />
       <Panel defaultSize={50} className="h-full">
@@ -101,7 +99,7 @@ const Problem = ({ id }: { id: string }) => {
             className="h-full flex flex-col"
             style={{ height: "calc(100vh - 78px)" }}
           >
-            <CodingEnv />
+            <EditorWithTests />
           </SandpackLayout>
         </SandpackProvider>
       </Panel>
