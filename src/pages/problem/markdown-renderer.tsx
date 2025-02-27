@@ -1,4 +1,4 @@
-import { Link } from "@mui/material";
+import { Link, Typography } from "@mui/material";
 import Markdown from "react-markdown";
 import { Prism } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -15,18 +15,23 @@ export const MarkdownRenderer = ({
       components={{
         ol: ({ children, ...props }) => (
           <ol className="list-decimal list-inside" {...props}>
-            {children}
+            <Typography variant="body1">{children}</Typography>
           </ol>
         ),
         ul: ({ children, ...props }) => (
           <ul className="list-disc list-inside" {...props}>
-            {children}
+            <Typography variant="body1">{children}</Typography>
           </ul>
         ),
         a: ({ children, ...props }) => (
           <Link target="_blank" {...props}>
             {children}
           </Link>
+        ),
+        p: ({ children }) => (
+          <Typography variant="body1" color="">
+            {children}
+          </Typography>
         ),
         code(props) {
           const { children, className, ...rest } = props;
