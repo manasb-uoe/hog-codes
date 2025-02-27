@@ -13,7 +13,7 @@ import { Link, Navigate, Route, Routes } from "react-router";
 import { useAuthContext } from "./auth/auth-context";
 import { ProblemsListPage } from "./pages/problems-list-page";
 import { problemCategories } from "./types";
-import { ProblemPage } from "./pages/problem-page";
+import { ProblemPage } from "./pages/problem/problem-page";
 
 function App() {
   const authContext = useAuthContext();
