@@ -85,7 +85,7 @@ function App() {
           </div>
         </Toolbar>
       </AppBar>
-      <div className="flex-grow p-4 ">
+      <div className="flex-grow p-4">
         <Routes>
           <Route path="/problems/:category" element={<ProblemsListPage />} />
           <Route path="/problems/:category" element={<ProblemsListPage />} />

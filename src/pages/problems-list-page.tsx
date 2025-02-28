@@ -11,7 +11,7 @@ import {
 import { Link, useParams } from "react-router";
 import { DifficultyChip } from "../components/difficulty-chip";
 import { TagChip } from "../components/tag-chip";
-import { useGetProblems } from "../store/use-get-problems";
+import { useGetProblems } from "../store/problems";
 import { IProblem, IProblemCategory } from "../types";
 
 const Problem = ({ problem }: { problem: IProblem }) => {
