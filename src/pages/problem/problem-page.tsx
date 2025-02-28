@@ -3,9 +3,12 @@ import {
   SandpackProvider,
   SandpackTests,
 } from "@codesandbox/sandpack-react";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import {
   Alert,
   Breadcrumbs,
+  Button,
   CircularProgress,
   Typography,
 } from "@mui/material";
@@ -14,7 +17,11 @@ import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { Link, useParams } from "react-router";
 import { DifficultyChip } from "../../components/difficulty-chip";
 import { TagChip } from "../../components/tag-chip";
-import { useGetProblem } from "../../store/problems";
+import {
+  useGetProblem,
+  useGetProblemCompletion,
+  useSetProblemCompletion,
+} from "../../store/problems";
 import { IProblem } from "../../types";
 import { CodeEditor } from "./code-editor";
 import { MarkdownRenderer } from "./markdown-renderer";
@@ -43,6 +50,9 @@ const ProblemDescription = ({
 };
 
 const ProblemHeader = ({ problem }: { problem: IProblem }) => {
+  const completion = useGetProblemCompletion(problem.id);
+  const { mutate: mutateCompletion } = useSetProblemCompletion(problem.id);
+
   return (
     <div className="flex justify-between items-center mb-2">
       <Breadcrumbs>
@@ -51,7 +61,23 @@ const ProblemHeader = ({ problem }: { problem: IProblem }) => {
         </Link>
         <Typography variant="body2">{problem.title}</Typography>
       </Breadcrumbs>
-      <div className="flex"></div>
+      <div className="flex">
+        <Button
+          variant="outlined"
+          onClick={() => mutateCompletion(!completion.data)}
+          endIcon={
+            completion.data ? (
+              <CheckCircleIcon color="success" fontSize="small" />
+            ) : (
+              <CheckCircleOutlineIcon fontSize="small" />
+            )
+          }
+          loading={completion.isPending}
+          size="small"
+        >
+          Mark as Completed
+        </Button>
+      </div>
     </div>
   );
 };
@@ -59,7 +85,7 @@ const ProblemHeader = ({ problem }: { problem: IProblem }) => {
 const Problem = ({ id }: { id: string }) => {
   const problem = useGetProblem(id);
 
-  if (problem.loading) {
+  if (problem.isPending) {
     return <CircularProgress size={"small"} />;
   }
 

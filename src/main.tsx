@@ -1,4 +1,5 @@
 import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
@@ -22,8 +23,9 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
 const auth = getAuth();
+
+const queryClient = new QueryClient();
 
 export const ThemeWrapper = ({
   children,
@@ -54,14 +56,16 @@ export const ThemeWrapper = ({
 };
 
 createRoot(document.getElementById("root")!).render(
-  <ThemeWrapper>
-    <CssBaseline />
-    <BrowserRouter>
-      <DbContext.Provider value={db}>
-        <AuthContextProvider auth={auth}>
-          <App />
-        </AuthContextProvider>
-      </DbContext.Provider>
-    </BrowserRouter>
-  </ThemeWrapper>
+  <QueryClientProvider client={queryClient}>
+    <ThemeWrapper>
+      <CssBaseline />
+      <BrowserRouter>
+        <DbContext.Provider value={db}>
+          <AuthContextProvider auth={auth}>
+            <App />
+          </AuthContextProvider>
+        </DbContext.Provider>
+      </BrowserRouter>
+    </ThemeWrapper>
+  </QueryClientProvider>
 );
