@@ -13,15 +13,14 @@ import {
   Typography,
 } from "@mui/material";
 import classNames from "classnames";
+import { useCallback } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { Link, useParams } from "react-router";
+import { useAuthContext } from "../../auth/auth-context";
 import { DifficultyChip } from "../../components/difficulty-chip";
 import { TagChip } from "../../components/tag-chip";
-import {
-  useGetProblem,
-  useGetProblemCompletion,
-  useSetProblemCompletion,
-} from "../../store/problems";
+import { useGetProblem } from "../../store/problems";
+import { useSetUser } from "../../store/users";
 import { IProblem } from "../../types";
 import { CodeEditor } from "./code-editor";
 import { MarkdownRenderer } from "./markdown-renderer";
@@ -50,8 +49,23 @@ const ProblemDescription = ({
 };
 
 const ProblemHeader = ({ problem }: { problem: IProblem }) => {
-  const completion = useGetProblemCompletion(problem.id);
-  const { mutate: mutateCompletion } = useSetProblemCompletion(problem.id);
+  const { user } = useAuthContext();
+  const isCompleted = user.completions[problem.id];
+  const setUserMutation = useSetUser();
+
+  const setCompleted = useCallback(() => {
+    const completions = { ...user.completions };
+    if (isCompleted) {
+      delete completions[problem.id];
+    } else {
+      completions[problem.id] = true;
+    }
+
+    setUserMutation.mutateAsync({
+      ...user,
+      completions,
+    });
+  }, [isCompleted, setUserMutation, user, problem.id]);
 
   return (
     <div className="flex justify-between items-center mb-2">
@@ -64,15 +78,14 @@ const ProblemHeader = ({ problem }: { problem: IProblem }) => {
       <div className="flex">
         <Button
           variant="outlined"
-          onClick={() => mutateCompletion(!completion.data)}
+          onClick={setCompleted}
           endIcon={
-            completion.data ? (
+            isCompleted ? (
               <CheckCircleIcon color="success" fontSize="small" />
             ) : (
               <CheckCircleOutlineIcon fontSize="small" />
             )
           }
-          loading={completion.isPending}
           size="small"
         >
           Mark as Completed

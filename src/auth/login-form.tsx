@@ -38,7 +38,7 @@ export const LoginForm = ({
         email,
         password
       );
-      await setUserMutation.mutate({ id: response.user.uid });
+      await setUserMutation.mutate({ id: response.user.uid, completions: {} });
       return response;
     },
     [setUserMutation.mutate]

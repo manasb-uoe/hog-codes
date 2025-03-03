@@ -6,15 +6,15 @@ import {
   setPersistence,
   signOut,
   User,
-  UserInfo,
 } from "firebase/auth";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { isAdmin } from "../store/admins";
 import { useDbContext } from "../store/db-context";
+import { IUser, useUser } from "../store/users";
 import { LoginForm } from "./login-form";
 
 type IAuthContext = {
-  user: UserInfo;
+  user: IUser;
   logout: () => Promise<void>;
   isAdmin: boolean;
 };
@@ -28,7 +28,7 @@ export const AuthContextProvider = ({
   auth,
   children,
 }: React.PropsWithChildren<{ auth: Auth }>) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [userId, setUserId] = useState<string>();
   const [admin, setAdmin] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
   const [showLogin, setShowLogin] = useState(false);
@@ -41,7 +41,7 @@ export const AuthContextProvider = ({
         console.log("User logged in:", user.uid);
 
         setAdmin(await isAdmin(db, user.uid));
-        setUser(user);
+        setUserId(user.uid);
         setLoading(false);
       } else {
         setShowLogin(true);
@@ -50,16 +50,18 @@ export const AuthContextProvider = ({
     });
   }, [auth, db]);
 
+  const user = useUser(userId);
+
   const logout = useCallback(async () => {
     return await signOut(auth);
   }, [auth]);
 
   const onLoginSuccess = useCallback((user: User) => {
-    setUser(user);
+    setUserId(user.uid);
     setShowLogin(false);
   }, []);
 
-  if (loading) {
+  if (loading || user.isPending) {
     return (
       <div className="flex items-center justify-center h-full">
         <CircularProgress />
@@ -72,7 +74,7 @@ export const AuthContextProvider = ({
   }
 
   return (
-    <AuthContext.Provider value={{ user: user!, logout, isAdmin: admin }}>
+    <AuthContext.Provider value={{ user: user.data!, logout, isAdmin: admin }}>
       {children}
     </AuthContext.Provider>
   );

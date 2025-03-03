@@ -1,11 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { useAuthContext } from "../auth/auth-context";
 import { useDbContext } from "./db-context";
 
 export interface IUser {
   id: string;
-  completions?: Record<string, boolean>;
+  completions: Record<string, boolean>;
 }
 
 const queryKeys = {
@@ -31,16 +30,16 @@ export const useSetUser = () => {
   });
 };
 
-export const useGetCurrentUser = () => {
+export const useUser = (id?: string) => {
   const db = useDbContext();
-  const auth = useAuthContext();
 
   return useQuery({
-    queryKey: queryKeys.users.get(auth.user.uid),
+    queryKey: queryKeys.users.get(id!),
     queryFn: async () => {
-      const docRef = doc(db, "users", auth.user.uid);
+      const docRef = doc(db, "users", id!);
       const snap = await getDoc(docRef);
       return snap.data() as IUser;
     },
+    enabled: !!id,
   });
 };

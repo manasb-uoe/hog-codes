@@ -1,4 +1,5 @@
 import CodeIcon from "@mui/icons-material/Code";
+import DoneAllIcon from "@mui/icons-material/DoneAll";
 import {
   Alert,
   CircularProgress,
@@ -9,16 +10,27 @@ import {
   Typography,
 } from "@mui/material";
 import { Link, useParams } from "react-router";
+import { useAuthContext } from "../auth/auth-context";
 import { DifficultyChip } from "../components/difficulty-chip";
 import { TagChip } from "../components/tag-chip";
 import { useGetProblems } from "../store/problems";
 import { IProblem, IProblemCategory } from "../types";
 
-const Problem = ({ problem }: { problem: IProblem }) => {
+const Problem = ({
+  problem,
+  isCompleted,
+}: {
+  problem: IProblem;
+  isCompleted: boolean;
+}) => {
   return (
     <ListItem classes={{ root: "!py-0 !px-2" }}>
       <ListItemIcon classes={{ root: "!min-w-[40px]" }}>
-        <CodeIcon fontSize="small" />
+        {isCompleted ? (
+          <DoneAllIcon color="success" fontSize="small" />
+        ) : (
+          <CodeIcon fontSize="small" />
+        )}
       </ListItemIcon>
       <ListItemText>
         <div className="flex gap-2">
@@ -37,12 +49,13 @@ const Problem = ({ problem }: { problem: IProblem }) => {
 
 export const ProblemsListPage = () => {
   const { category } = useParams<{ category: IProblemCategory }>();
+  const { user } = useAuthContext();
 
   if (!category) throw new Error("Category cannot be undefined!");
 
   const problems = useGetProblems(category);
 
-  if (problems.loading) {
+  if (problems.isPending) {
     return <CircularProgress size={"small"} />;
   }
 
@@ -65,7 +78,11 @@ export const ProblemsListPage = () => {
       </Typography>
       <List>
         {problems.data?.map((problem) => (
-          <Problem problem={problem} key={problem.id} />
+          <Problem
+            problem={problem}
+            key={problem.id}
+            isCompleted={user.completions[problem.id] === true}
+          />
         ))}
       </List>
     </div>
