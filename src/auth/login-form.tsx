@@ -13,6 +13,7 @@ import {
   User,
 } from "firebase/auth";
 import { useCallback, useState } from "react";
+import { useSetUser } from "../store/users";
 
 export const LoginForm = ({
   auth,
@@ -28,6 +29,21 @@ export const LoginForm = ({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const setUserMutation = useSetUser();
+
+  const createUser = useCallback(
+    async (email: string, password: string) => {
+      const response = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      await setUserMutation.mutate({ id: response.user.uid });
+      return response;
+    },
+    [setUserMutation.mutate]
+  );
+
   const submit = useCallback(
     async (mode: "login" | "signup") => {
       try {
@@ -36,7 +52,7 @@ export const LoginForm = ({
         const { user } =
           mode === "login"
             ? await signInWithEmailAndPassword(auth, email, password)
-            : await createUserWithEmailAndPassword(auth, email, password);
+            : await createUser(email, password);
         onSuccess(user);
       } catch (err) {
         setError(err as Error);
