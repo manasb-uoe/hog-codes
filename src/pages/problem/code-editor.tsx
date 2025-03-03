@@ -7,12 +7,42 @@ import {
 } from "@codesandbox/sandpack-react";
 import Editor from "@monaco-editor/react";
 import { Typography, useTheme } from "@mui/material";
+import { Ref, useCallback, useImperativeHandle, useState } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
-export function CodeEditor() {
+export interface ICodeEditorRef {
+  resetAllFiles: () => void;
+}
+
+export function CodeEditor({
+  onChange,
+  ref,
+}: {
+  onChange?: (fileName: string, code: string) => void;
+  ref: Ref<ICodeEditorRef>;
+}) {
   const { code, updateCode } = useActiveCode();
   const { sandpack } = useSandpack();
   const theme = useTheme();
+
+  const [resetCounter, setResetCounter] = useState(0);
+
+  useImperativeHandle(ref, () => {
+    return {
+      resetAllFiles: () => {
+        sandpack.resetAllFiles();
+        setResetCounter((prev) => prev + 1);
+      },
+    };
+  });
+
+  const _updateCode = useCallback(
+    (code?: string) => {
+      onChange?.(sandpack.activeFile, code ?? "");
+      updateCode(code ?? "");
+    },
+    [updateCode, onChange, sandpack.activeFile]
+  );
 
   return (
     <SandpackStack className="m-0 h-full">
@@ -23,9 +53,9 @@ export function CodeEditor() {
             width="100%"
             language="javascript"
             theme={theme.palette.mode === "dark" ? "vs-dark" : "vs-light"}
-            key={sandpack.activeFile}
+            key={`${resetCounter}-${sandpack.activeFile}`}
             defaultValue={code}
-            onChange={(value) => updateCode(value || "")}
+            onChange={_updateCode}
           />
         </Panel>
         <PanelResizeHandle

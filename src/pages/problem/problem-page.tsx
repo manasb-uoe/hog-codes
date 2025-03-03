@@ -13,7 +13,7 @@ import {
   Typography,
 } from "@mui/material";
 import classNames from "classnames";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { Link, useParams } from "react-router";
 import { useAuthContext } from "../../auth/auth-context";
@@ -22,7 +22,7 @@ import { TagChip } from "../../components/tag-chip";
 import { useGetProblem } from "../../store/problems";
 import { useSetUser } from "../../store/users";
 import { IProblem } from "../../types";
-import { CodeEditor } from "./code-editor";
+import { CodeEditor, ICodeEditorRef } from "./code-editor";
 import { MarkdownRenderer } from "./markdown-renderer";
 
 const ProblemDescription = ({
@@ -48,7 +48,13 @@ const ProblemDescription = ({
   );
 };
 
-const ProblemHeader = ({ problem }: { problem: IProblem }) => {
+const ProblemHeader = ({
+  problem,
+  onResetClick,
+}: {
+  problem: IProblem;
+  onResetClick?: () => void;
+}) => {
   const { user } = useAuthContext();
   const isCompleted = user.completions[problem.id];
   const setUserMutation = useSetUser();
@@ -75,7 +81,10 @@ const ProblemHeader = ({ problem }: { problem: IProblem }) => {
         </Link>
         <Typography variant="body2">{problem.title}</Typography>
       </Breadcrumbs>
-      <div className="flex">
+      <div className="flex gap-2">
+        <Button size="small" onClick={onResetClick}>
+          Reset
+        </Button>
         <Button
           variant="outlined"
           onClick={setCompleted}
@@ -98,6 +107,8 @@ const ProblemHeader = ({ problem }: { problem: IProblem }) => {
 const Problem = ({ id }: { id: string }) => {
   const problem = useGetProblem(id);
 
+  const codeEditorRef = useRef<ICodeEditorRef>(null);
+
   if (problem.isPending) {
     return <CircularProgress size={"small"} />;
   }
@@ -117,14 +128,17 @@ const Problem = ({ id }: { id: string }) => {
   );
 
   return (
-    <div className="flex flex-col h-full">
-      <ProblemHeader problem={problem.data} />
-      <SandpackProvider
-        className="!h-full"
-        theme={"auto"}
-        template="vanilla"
-        files={files}
-      >
+    <SandpackProvider
+      className="!h-full"
+      theme={"auto"}
+      template="vanilla"
+      files={files}
+    >
+      <div className="flex flex-col h-full">
+        <ProblemHeader
+          problem={problem.data}
+          onResetClick={() => codeEditorRef.current?.resetAllFiles()}
+        />
         <PanelGroup direction="horizontal">
           <Panel defaultSize={30}>
             <PanelGroup direction="vertical">
@@ -148,16 +162,13 @@ const Problem = ({ id }: { id: string }) => {
             hitAreaMargins={{ coarse: 25, fine: 15 }}
           />
           <Panel defaultSize={50} className="h-full">
-            <SandpackLayout
-              className="h-full flex flex-col"
-              // style={{ height: "calc(100vh - 78px)" }}
-            >
-              <CodeEditor />
+            <SandpackLayout className="h-full flex flex-col">
+              <CodeEditor ref={codeEditorRef} />
             </SandpackLayout>
           </Panel>
         </PanelGroup>
-      </SandpackProvider>
-    </div>
+      </div>
+    </SandpackProvider>
   );
 };
 
