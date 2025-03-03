@@ -13,14 +13,14 @@ import {
   Typography,
 } from "@mui/material";
 import classNames from "classnames";
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { Link, useParams } from "react-router";
 import { useAuthContext } from "../../auth/auth-context";
 import { DifficultyChip } from "../../components/difficulty-chip";
 import { TagChip } from "../../components/tag-chip";
 import { useGetProblem } from "../../store/problems";
-import { useSetUser } from "../../store/users";
+import { useSetSubmission, useSetUser } from "../../store/users";
 import { IProblem } from "../../types";
 import { CodeEditor, ICodeEditorRef } from "./code-editor";
 import { MarkdownRenderer } from "./markdown-renderer";
@@ -50,10 +50,12 @@ const ProblemDescription = ({
 
 const ProblemHeader = ({
   problem,
-  onResetClick,
+  codeEditorRef,
+  onReset,
 }: {
   problem: IProblem;
-  onResetClick?: () => void;
+  codeEditorRef: React.RefObject<ICodeEditorRef | null>;
+  onReset?: () => void;
 }) => {
   const { user } = useAuthContext();
   const isCompleted = user.completions[problem.id];
@@ -73,6 +75,30 @@ const ProblemHeader = ({
     });
   }, [isCompleted, setUserMutation, user, problem.id]);
 
+  const { mutateAsync: setSubmission, isPending: setSubmissionPending } =
+    useSetSubmission();
+
+  const handleSave = useCallback(async () => {
+    if (!codeEditorRef.current) return;
+
+    const filesToSave = Object.entries(
+      codeEditorRef.current?.getAllFilesContent().current
+    ).reduce<Record<string, string>>((acc, [file, content]) => {
+      // ignore test files as we never want to save changes to them
+      if (!file.includes(".test")) {
+        acc[file] = content;
+      }
+      return acc;
+    }, {});
+
+    await setSubmission({ problemId: problem.id, submission: filesToSave });
+  }, [setSubmission, problem.id, codeEditorRef]);
+
+  const handleReset = useCallback(async () => {
+    codeEditorRef.current?.resetAllFiles();
+    onReset?.();
+  }, [codeEditorRef, onReset]);
+
   return (
     <div className="flex justify-between items-center mb-2">
       <Breadcrumbs>
@@ -82,7 +108,14 @@ const ProblemHeader = ({
         <Typography variant="body2">{problem.title}</Typography>
       </Breadcrumbs>
       <div className="flex gap-2">
-        <Button size="small" onClick={onResetClick}>
+        <Button
+          loading={setSubmissionPending}
+          size="small"
+          onClick={handleSave}
+        >
+          Save
+        </Button>
+        <Button size="small" onClick={handleReset}>
           Reset
         </Button>
         <Button
@@ -108,6 +141,8 @@ const Problem = ({ id }: { id: string }) => {
   const problem = useGetProblem(id);
 
   const codeEditorRef = useRef<ICodeEditorRef>(null);
+
+  const [codeEditorKey, setCodeEditorKey] = useState(0);
 
   if (problem.isPending) {
     return <CircularProgress size={"small"} />;
@@ -137,7 +172,8 @@ const Problem = ({ id }: { id: string }) => {
       <div className="flex flex-col h-full">
         <ProblemHeader
           problem={problem.data}
-          onResetClick={() => codeEditorRef.current?.resetAllFiles()}
+          codeEditorRef={codeEditorRef}
+          onReset={() => setCodeEditorKey((prev) => prev + 1)}
         />
         <PanelGroup direction="horizontal">
           <Panel defaultSize={30}>
@@ -150,10 +186,7 @@ const Problem = ({ id }: { id: string }) => {
                 hitAreaMargins={{ coarse: 25, fine: 15 }}
               />
               <Panel>
-                <SandpackTests
-                  className="h-full"
-                  onComplete={(specs) => console.log(specs)}
-                />
+                <SandpackTests className="h-full" />
               </Panel>
             </PanelGroup>
           </Panel>
@@ -163,7 +196,7 @@ const Problem = ({ id }: { id: string }) => {
           />
           <Panel defaultSize={50} className="h-full">
             <SandpackLayout className="h-full flex flex-col">
-              <CodeEditor ref={codeEditorRef} />
+              <CodeEditor key={codeEditorKey} ref={codeEditorRef} />
             </SandpackLayout>
           </Panel>
         </PanelGroup>

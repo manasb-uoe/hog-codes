@@ -7,41 +7,49 @@ import {
 } from "@codesandbox/sandpack-react";
 import Editor from "@monaco-editor/react";
 import { Typography, useTheme } from "@mui/material";
-import { Ref, useCallback, useImperativeHandle, useState } from "react";
+import { Ref, useCallback, useImperativeHandle, useRef } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 export interface ICodeEditorRef {
   resetAllFiles: () => void;
+  getAllFilesContent: () => React.RefObject<Record<string, string>>;
 }
 
-export function CodeEditor({
-  onChange,
-  ref,
-}: {
-  onChange?: (fileName: string, code: string) => void;
-  ref: Ref<ICodeEditorRef>;
-}) {
+export function CodeEditor({ ref }: { ref: Ref<ICodeEditorRef> }) {
   const { code, updateCode } = useActiveCode();
   const { sandpack } = useSandpack();
   const theme = useTheme();
 
-  const [resetCounter, setResetCounter] = useState(0);
+  const getAllVisibleFilesContent = useCallback(() => {
+    return sandpack.visibleFiles.reduce<Record<string, string>>((acc, path) => {
+      acc[path] = sandpack.files[path].code;
+      return acc;
+    }, {});
+  }, [sandpack.files, sandpack.visibleFiles]);
+
+  const fileContentMap = useRef<Record<string, string>>(
+    getAllVisibleFilesContent()
+  );
 
   useImperativeHandle(ref, () => {
     return {
       resetAllFiles: () => {
         sandpack.resetAllFiles();
-        setResetCounter((prev) => prev + 1);
+        fileContentMap.current = getAllVisibleFilesContent();
+      },
+      getAllFilesContent: () => {
+        return fileContentMap;
       },
     };
   });
 
   const _updateCode = useCallback(
     (code?: string) => {
-      onChange?.(sandpack.activeFile, code ?? "");
-      updateCode(code ?? "");
+      const value = code ?? "";
+      updateCode(value);
+      fileContentMap.current[sandpack.activeFile] = value;
     },
-    [updateCode, onChange, sandpack.activeFile]
+    [updateCode, sandpack.activeFile]
   );
 
   return (
@@ -53,7 +61,7 @@ export function CodeEditor({
             width="100%"
             language="javascript"
             theme={theme.palette.mode === "dark" ? "vs-dark" : "vs-light"}
-            key={`${resetCounter}-${sandpack.activeFile}`}
+            key={sandpack.activeFile}
             defaultValue={code}
             onChange={_updateCode}
           />
@@ -80,7 +88,7 @@ export function CodeEditor({
                 Console
               </Typography>
             </div>
-            <SandpackConsole className="h-full" />
+            <SandpackConsole showResetConsoleButton className="h-full" />
           </div>
         </Panel>
         <PanelResizeHandle

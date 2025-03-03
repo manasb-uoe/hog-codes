@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { doc, getDoc, setDoc } from "firebase/firestore";
+import { useAuthContext } from "../auth/auth-context";
 import { useDbContext } from "./db-context";
 
 export interface IUser {
@@ -7,9 +8,14 @@ export interface IUser {
   completions: Record<string, boolean>;
 }
 
+export type TSubmission = Record<string, string>;
+
 const queryKeys = {
   users: {
     get: (id: string) => ["users", id],
+  },
+  submissions: {
+    get: (id: string) => ["submissions", id],
   },
 };
 
@@ -41,5 +47,48 @@ export const useUser = (id?: string) => {
       return snap.data() as IUser;
     },
     enabled: !!id,
+  });
+};
+
+export const useGetSubmission = (problemId: string) => {
+  const db = useDbContext();
+  const { user } = useAuthContext();
+
+  return useQuery({
+    queryKey: queryKeys.submissions.get(problemId),
+    queryFn: async () => {
+      const docRef = doc(db, "users", user.id, "submissions", problemId);
+      const snap = await getDoc(docRef);
+      if (!snap.exists) {
+        throw new Error(`No submission found with id=${problemId}`);
+      }
+
+      return snap.data() as TSubmission;
+    },
+  });
+};
+
+export const useSetSubmission = () => {
+  const db = useDbContext();
+  const client = useQueryClient();
+  const { user } = useAuthContext();
+
+  return useMutation({
+    mutationFn: async ({
+      problemId,
+      submission,
+    }: {
+      problemId: string;
+      submission: TSubmission;
+    }) => {
+      console.log("saving", "users", user.id, "submissions", problemId);
+      const docRef = doc(db, "users", user.id, "submissions", problemId);
+      await setDoc(docRef, submission);
+    },
+    onSuccess: (_, variables) => {
+      client.invalidateQueries({
+        queryKey: queryKeys.submissions.get(variables.problemId),
+      });
+    },
   });
 };
