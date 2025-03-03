@@ -29,7 +29,7 @@ export const LoginForm = ({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const setUserMutation = useSetUser();
+  const { mutate: setUserMutation } = useSetUser();
 
   const createUser = useCallback(
     async (email: string, password: string) => {
@@ -38,10 +38,10 @@ export const LoginForm = ({
         email,
         password
       );
-      await setUserMutation.mutate({ id: response.user.uid, completions: {} });
+      await setUserMutation({ id: response.user.uid, completions: {} });
       return response;
     },
-    [setUserMutation.mutate]
+    [setUserMutation, auth]
   );
 
   const submit = useCallback(
@@ -60,7 +60,7 @@ export const LoginForm = ({
         setLoading(false);
       }
     },
-    [email, password, auth, onSuccess]
+    [email, password, auth, onSuccess, createUser]
   );
 
   return (
