@@ -1,0 +1,95 @@
+title: Implement promisify()
+description: |
+  Let's take a look at following error-first callback.
+
+  ```javascript
+  const callback = (error, data) => {
+    if (error) {
+      // handle the error
+    } else {
+      // handle the data
+    }
+  } 
+  ```
+
+  Now think about async functions that takes above error-first callback as last argument.
+
+  ```javascript
+  const func = (arg1, arg2, callback) => {
+    // some async logic
+    if (hasError) {
+      callback(someError)
+    } else {
+      callback(null, someData)
+    }
+  }
+  ```
+
+  You see what needs to be done now. Implement `promisify()` to behave as shown below: 
+  ```javascript
+  const promisedFunc = promisify(func)
+  promisedFunc().then((data) => {
+    // handles data
+  }).catch((error) => {
+    // handles error
+  })
+  ```
+category: JavaScript
+tags: []
+difficulty: easy
+files:
+  - name: index.js
+    content: |
+      /**
+      * @param {(...args) => void} func
+      * @returns {(...args) => Promise<any>}
+      */
+      export function promisify(func) {
+        // your code here
+      }
+
+  - name: index.test.js
+    content: |
+      import { promisify } from './index';
+
+      test('should resolve with correct data when callback succeeds', async () => {
+        const asyncFunction = (arg, callback) => {
+          setTimeout(() => callback(null, `Hello, ${arg}`), 100);
+        };
+
+        const promisifiedFunc = promisify(asyncFunction);
+        await expect(promisifiedFunc('World')).resolves.toBe('Hello, World');
+      });
+
+      test('should reject with error when callback returns an error', async () => {
+        const failingFunction = (arg, callback) => {
+          setTimeout(() => callback(new Error('Something went wrong')), 100);
+        };
+
+        const promisifiedFunc = promisify(failingFunction);
+        await expect(promisifiedFunc('Test')).rejects.toThrow('Something went wrong');
+      });
+
+      test('should preserve the function context', async () => {
+        class TestClass {
+          constructor(name) {
+            this.name = name;
+          }
+          method(callback) {
+            callback(null, `Hello, ${this.name}`);
+          }
+        }
+        
+        const instance = new TestClass('Alice');
+        const promisifiedMethod = promisify(instance.method).bind(instance);
+        await expect(promisifiedMethod()).resolves.toBe('Hello, Alice');
+      });
+
+      test('should work with functions that take multiple arguments', async () => {
+        const sumFunction = (a, b, callback) => {
+          callback(null, a + b);
+        };
+
+        const promisifiedSum = promisify(sumFunction);
+        await expect(promisifiedSum(3, 4)).resolves.toBe(7);
+      });
