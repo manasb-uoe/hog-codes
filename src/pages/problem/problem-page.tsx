@@ -211,7 +211,12 @@ const Problem = ({ id }: { id: string }) => {
                 className="h-[2px]"
                 hitAreaMargins={{ coarse: 25, fine: 15 }}
               />
-              <Panel>
+              <Panel
+                className="border-t"
+                style={{
+                  borderColor: "var(--sp-colors-surface2)",
+                }}
+              >
                 <SandpackTests watchMode={false} className="h-full" />
               </Panel>
             </PanelGroup>
