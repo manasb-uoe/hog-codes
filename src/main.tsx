@@ -1,5 +1,6 @@
 import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { NotificationsProvider } from "@toolpad/core/useNotifications";
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
@@ -58,14 +59,23 @@ export const ThemeWrapper = ({
 createRoot(document.getElementById("root")!).render(
   <QueryClientProvider client={queryClient}>
     <ThemeWrapper>
-      <CssBaseline />
-      <BrowserRouter>
-        <DbContext.Provider value={db}>
-          <AuthContextProvider auth={auth}>
-            <App />
-          </AuthContextProvider>
-        </DbContext.Provider>
-      </BrowserRouter>
+      <NotificationsProvider
+        slotProps={{
+          snackbar: {
+            autoHideDuration: 3000,
+            anchorOrigin: { vertical: "bottom", horizontal: "right" },
+          },
+        }}
+      >
+        <CssBaseline />
+        <BrowserRouter>
+          <DbContext.Provider value={db}>
+            <AuthContextProvider auth={auth}>
+              <App />
+            </AuthContextProvider>
+          </DbContext.Provider>
+        </BrowserRouter>
+      </NotificationsProvider>
     </ThemeWrapper>
   </QueryClientProvider>
 );

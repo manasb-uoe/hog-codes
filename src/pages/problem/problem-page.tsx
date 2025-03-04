@@ -12,6 +12,7 @@ import {
   CircularProgress,
   Typography,
 } from "@mui/material";
+import { useNotifications } from "@toolpad/core/useNotifications";
 import classNames from "classnames";
 import { useCallback, useRef } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
@@ -63,7 +64,9 @@ const ProblemHeader = ({
   const isCompleted = user.completions[problem.id];
   const setUserMutation = useSetUser();
 
-  const setCompleted = useCallback(() => {
+  const notifications = useNotifications();
+
+  const setCompleted = useCallback(async () => {
     const completions = { ...user.completions };
     if (isCompleted) {
       delete completions[problem.id];
@@ -71,11 +74,16 @@ const ProblemHeader = ({
       completions[problem.id] = true;
     }
 
-    setUserMutation.mutateAsync({
+    await setUserMutation.mutateAsync({
       ...user,
       completions,
     });
-  }, [isCompleted, setUserMutation, user, problem.id]);
+
+    notifications.show(
+      isCompleted ? "Problem uncompleted" : "Problem completed",
+      { severity: isCompleted ? "info" : "success" }
+    );
+  }, [isCompleted, setUserMutation, user, problem.id, notifications]);
 
   const { mutateAsync: setSubmission, isPending: setSubmissionPending } =
     useSetSubmission();
@@ -96,17 +104,23 @@ const ProblemHeader = ({
     }, {});
 
     await setSubmission({ problemId: problem.id, submission: filesToSave });
-  }, [setSubmission, problem.id, codeEditorRef]);
+
+    notifications.show("Your submission has been saved", {
+      severity: "success",
+    });
+  }, [setSubmission, problem.id, codeEditorRef, notifications]);
 
   const handleReset = useCallback(async () => {
     codeEditorRef.current?.resetAllFiles();
-  }, [codeEditorRef]);
+    notifications.show("All files have been reset", { severity: "info" });
+  }, [codeEditorRef, notifications]);
 
   const loadLastSubmission = useCallback(() => {
     if (submission.data) {
       codeEditorRef.current?.updateFiles(submission.data);
+      notifications.show("Last submission loaded", { severity: "info" });
     }
-  }, [submission.data, codeEditorRef]);
+  }, [submission.data, codeEditorRef, notifications]);
 
   return (
     <div className="flex justify-between items-center mb-2">
