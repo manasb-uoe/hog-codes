@@ -8,7 +8,14 @@ import {
 import { Editor, OnMount } from "@monaco-editor/react";
 import { Typography, useTheme } from "@mui/material";
 import { KeyCode, KeyMod } from "monaco-editor";
-import { Ref, useCallback, useImperativeHandle, useRef, useState } from "react";
+import {
+  Ref,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 export interface ICodeEditorRef {
@@ -34,14 +41,17 @@ function prefixPathsWithSlash(files: Record<string, string>) {
 export function CodeEditor({
   ref,
   initialFiles,
+  onInitialized,
 }: {
   ref: Ref<ICodeEditorRef>;
   initialFiles: Record<string, string>;
+  onInitialized?: () => void;
 }) {
   const { code, updateCode } = useActiveCode();
-  const { sandpack, dispatch } = useSandpack();
+  const { sandpack, dispatch, listen } = useSandpack();
   const theme = useTheme();
   const [editorResetCounter, setEditorResetCounter] = useState(0);
+  const [initialized, setInitialized] = useState(false);
 
   const fileContentMap = useRef<Record<string, string>>(null);
 
@@ -84,6 +94,20 @@ export function CodeEditor({
     [updateCode, sandpack.activeFile]
   );
 
+  useEffect(() => {
+    if (initialized) return;
+
+    const stop = listen((message) => {
+      if (message.type === "done") {
+        if (initialized) return;
+        onInitialized?.();
+        setInitialized(true);
+      }
+    });
+
+    return () => stop();
+  }, [listen, onInitialized, initialized]);
+
   const onEditorMount = useCallback<OnMount>(
     (editor) => {
       editor.addAction({
@@ -103,15 +127,24 @@ export function CodeEditor({
       <FileTabs />
       <PanelGroup direction="vertical">
         <Panel defaultSize={80}>
-          <Editor
-            onMount={onEditorMount}
-            width="100%"
-            language="javascript"
-            theme={theme.palette.mode === "dark" ? "vs-dark" : "vs-light"}
-            key={`${sandpack.activeFile}-${editorResetCounter}`}
-            defaultValue={code}
-            onChange={_updateCode}
-          />
+          {initialized ? (
+            <Editor
+              loading={null}
+              onMount={onEditorMount}
+              width="100%"
+              language="javascript"
+              theme={theme.palette.mode === "dark" ? "vs-dark" : "vs-light"}
+              key={`${sandpack.activeFile}-${editorResetCounter}`}
+              defaultValue={code}
+              onChange={_updateCode}
+            />
+          ) : (
+            <div className="h-full flex items-center justify-center">
+              <Typography variant="body1" color="text.secondary">
+                Loading...
+              </Typography>
+            </div>
+          )}
         </Panel>
         <PanelResizeHandle
           className="h-[1px]"

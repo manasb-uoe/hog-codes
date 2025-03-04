@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  DefinedInitialDataOptions,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { useAuthContext } from "../auth/auth-context";
 import { useDbContext } from "./db-context";
@@ -50,11 +55,15 @@ export const useUser = (id?: string) => {
   });
 };
 
-export const useGetSubmission = (problemId: string) => {
+export const useGetSubmission = (
+  problemId: string,
+  queryOptions?: Partial<DefinedInitialDataOptions<TSubmission>>
+) => {
   const db = useDbContext();
   const { user } = useAuthContext();
 
   return useQuery({
+    ...queryOptions,
     queryKey: queryKeys.submissions.get(problemId),
     queryFn: async () => {
       const docRef = doc(db, "users", user.id, "submissions", problemId);

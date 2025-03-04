@@ -12,6 +12,7 @@ import {
   CircularProgress,
   Typography,
 } from "@mui/material";
+import { UseQueryResult } from "@tanstack/react-query";
 import { useNotifications } from "@toolpad/core/useNotifications";
 import classNames from "classnames";
 import { useCallback, useRef } from "react";
@@ -22,6 +23,7 @@ import { DifficultyChip } from "../../components/difficulty-chip";
 import { TagChip } from "../../components/tag-chip";
 import { useGetProblem } from "../../store/problems";
 import {
+  TSubmission,
   useGetSubmission,
   useSetSubmission,
   useSetUser,
@@ -56,9 +58,13 @@ const ProblemDescription = ({
 const ProblemHeader = ({
   problem,
   codeEditorRef,
+  loadLastSubmission,
+  submission,
 }: {
   problem: IProblem;
   codeEditorRef: React.RefObject<ICodeEditorRef | null>;
+  submission: UseQueryResult<TSubmission, Error>;
+  loadLastSubmission: () => void;
 }) => {
   const { user } = useAuthContext();
   const isCompleted = user.completions[problem.id];
@@ -88,8 +94,6 @@ const ProblemHeader = ({
   const { mutateAsync: setSubmission, isPending: setSubmissionPending } =
     useSetSubmission();
 
-  const submission = useGetSubmission(problem.id);
-
   const handleSave = useCallback(async () => {
     if (!codeEditorRef.current) return;
 
@@ -114,13 +118,6 @@ const ProblemHeader = ({
     codeEditorRef.current?.resetAllFiles();
     notifications.show("All files have been reset", { severity: "info" });
   }, [codeEditorRef, notifications]);
-
-  const loadLastSubmission = useCallback(() => {
-    if (submission.data) {
-      codeEditorRef.current?.updateFiles(submission.data);
-      notifications.show("Last submission loaded", { severity: "info" });
-    }
-  }, [submission.data, codeEditorRef, notifications]);
 
   return (
     <div className="flex justify-between items-center mb-2">
@@ -174,6 +171,23 @@ const Problem = ({ id }: { id: string }) => {
 
   const codeEditorRef = useRef<ICodeEditorRef>(null);
 
+  const submission = useGetSubmission(problem.data?.id!, {
+    enabled: !!problem.data?.id,
+  });
+
+  const notifications = useNotifications();
+
+  const loadLastSubmission = useCallback(() => {
+    if (submission.data) {
+      codeEditorRef.current?.updateFiles(submission.data);
+      notifications.show("Last submission loaded", { severity: "info" });
+    }
+  }, [submission.data, codeEditorRef, notifications]);
+
+  const handleEditorInitialized = useCallback(() => {
+    loadLastSubmission();
+  }, [loadLastSubmission]);
+
   if (problem.isPending) {
     return <CircularProgress size={"small"} />;
   }
@@ -200,7 +214,12 @@ const Problem = ({ id }: { id: string }) => {
       files={files}
     >
       <div className="flex flex-col h-full">
-        <ProblemHeader problem={problem.data} codeEditorRef={codeEditorRef} />
+        <ProblemHeader
+          problem={problem.data}
+          codeEditorRef={codeEditorRef}
+          submission={submission}
+          loadLastSubmission={loadLastSubmission}
+        />
         <PanelGroup direction="horizontal">
           <Panel defaultSize={30}>
             <PanelGroup direction="vertical">
@@ -227,7 +246,11 @@ const Problem = ({ id }: { id: string }) => {
           />
           <Panel defaultSize={50} className="h-full">
             <SandpackLayout className="h-full flex flex-col">
-              <CodeEditor ref={codeEditorRef} initialFiles={files} />
+              <CodeEditor
+                ref={codeEditorRef}
+                initialFiles={files}
+                onInitialized={handleEditorInitialized}
+              />
             </SandpackLayout>
           </Panel>
         </PanelGroup>
