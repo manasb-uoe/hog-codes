@@ -13,14 +13,18 @@ import {
   Typography,
 } from "@mui/material";
 import classNames from "classnames";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { Link, useParams } from "react-router";
 import { useAuthContext } from "../../auth/auth-context";
 import { DifficultyChip } from "../../components/difficulty-chip";
 import { TagChip } from "../../components/tag-chip";
 import { useGetProblem } from "../../store/problems";
-import { useSetSubmission, useSetUser } from "../../store/users";
+import {
+  useGetSubmission,
+  useSetSubmission,
+  useSetUser,
+} from "../../store/users";
 import { IProblem } from "../../types";
 import { CodeEditor, ICodeEditorRef } from "./code-editor";
 import { MarkdownRenderer } from "./markdown-renderer";
@@ -51,11 +55,9 @@ const ProblemDescription = ({
 const ProblemHeader = ({
   problem,
   codeEditorRef,
-  onReset,
 }: {
   problem: IProblem;
   codeEditorRef: React.RefObject<ICodeEditorRef | null>;
-  onReset?: () => void;
 }) => {
   const { user } = useAuthContext();
   const isCompleted = user.completions[problem.id];
@@ -78,6 +80,8 @@ const ProblemHeader = ({
   const { mutateAsync: setSubmission, isPending: setSubmissionPending } =
     useSetSubmission();
 
+  const submission = useGetSubmission(problem.id);
+
   const handleSave = useCallback(async () => {
     if (!codeEditorRef.current) return;
 
@@ -96,8 +100,13 @@ const ProblemHeader = ({
 
   const handleReset = useCallback(async () => {
     codeEditorRef.current?.resetAllFiles();
-    onReset?.();
-  }, [codeEditorRef, onReset]);
+  }, [codeEditorRef]);
+
+  const loadLastSubmission = useCallback(() => {
+    if (submission.data) {
+      codeEditorRef.current?.updateFiles(submission.data);
+    }
+  }, [submission.data, codeEditorRef]);
 
   return (
     <div className="flex justify-between items-center mb-2">
@@ -108,6 +117,15 @@ const ProblemHeader = ({
         <Typography variant="body2">{problem.title}</Typography>
       </Breadcrumbs>
       <div className="flex gap-2">
+        {submission.data && (
+          <Button
+            loading={submission.isPending}
+            size="small"
+            onClick={loadLastSubmission}
+          >
+            Load Last Saved
+          </Button>
+        )}
         <Button
           loading={setSubmissionPending}
           size="small"
@@ -142,8 +160,6 @@ const Problem = ({ id }: { id: string }) => {
 
   const codeEditorRef = useRef<ICodeEditorRef>(null);
 
-  const [codeEditorKey, setCodeEditorKey] = useState(0);
-
   if (problem.isPending) {
     return <CircularProgress size={"small"} />;
   }
@@ -170,11 +186,7 @@ const Problem = ({ id }: { id: string }) => {
       files={files}
     >
       <div className="flex flex-col h-full">
-        <ProblemHeader
-          problem={problem.data}
-          codeEditorRef={codeEditorRef}
-          onReset={() => setCodeEditorKey((prev) => prev + 1)}
-        />
+        <ProblemHeader problem={problem.data} codeEditorRef={codeEditorRef} />
         <PanelGroup direction="horizontal">
           <Panel defaultSize={30}>
             <PanelGroup direction="vertical">
@@ -196,7 +208,7 @@ const Problem = ({ id }: { id: string }) => {
           />
           <Panel defaultSize={50} className="h-full">
             <SandpackLayout className="h-full flex flex-col">
-              <CodeEditor key={codeEditorKey} ref={codeEditorRef} />
+              <CodeEditor ref={codeEditorRef} initialFiles={files} />
             </SandpackLayout>
           </Panel>
         </PanelGroup>
