@@ -212,7 +212,7 @@ const Problem = ({ id }: { id: string }) => {
                 hitAreaMargins={{ coarse: 25, fine: 15 }}
               />
               <Panel>
-                <SandpackTests className="h-full" />
+                <SandpackTests watchMode={false} className="h-full" />
               </Panel>
             </PanelGroup>
           </Panel>

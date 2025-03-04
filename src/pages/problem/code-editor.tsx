@@ -114,6 +114,7 @@ export function CodeEditor({
           </div>
           <SandpackConsole
             showResetConsoleButton
+            showSetupProgress
             className="grow overflow-y-auto"
           />
         </Panel>
