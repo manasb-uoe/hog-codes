@@ -5,14 +5,18 @@ import {
 } from "@codesandbox/sandpack-react";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import DeleteIcon from "@mui/icons-material/Delete";
+import SaveIcon from "@mui/icons-material/Save";
+import SettingsBackupRestoreIcon from "@mui/icons-material/SettingsBackupRestore";
+import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 import {
   Alert,
   Breadcrumbs,
   Button,
+  ButtonGroup,
   CircularProgress,
   Typography,
 } from "@mui/material";
-import { UseQueryResult } from "@tanstack/react-query";
 import { useNotifications } from "@toolpad/core/useNotifications";
 import classNames from "classnames";
 import { useCallback, useRef } from "react";
@@ -23,7 +27,7 @@ import { DifficultyChip } from "../../components/difficulty-chip";
 import { TagChip } from "../../components/tag-chip";
 import { useGetProblem } from "../../store/problems";
 import {
-  TSubmission,
+  useDeleteSubmission,
   useGetSubmission,
   useSetSubmission,
   useSetUser,
@@ -63,7 +67,7 @@ const ProblemHeader = ({
 }: {
   problem: IProblem;
   codeEditorRef: React.RefObject<ICodeEditorRef | null>;
-  submission: UseQueryResult<TSubmission, Error>;
+  submission: ReturnType<typeof useGetSubmission>;
   loadLastSubmission: () => void;
 }) => {
   const { user } = useAuthContext();
@@ -94,6 +98,9 @@ const ProblemHeader = ({
   const { mutateAsync: setSubmission, isPending: setSubmissionPending } =
     useSetSubmission();
 
+  const { mutateAsync: deleteSubmission, isPending: deleteSubmissionPending } =
+    useDeleteSubmission();
+
   const handleSave = useCallback(async () => {
     if (!codeEditorRef.current) return;
 
@@ -119,6 +126,11 @@ const ProblemHeader = ({
     notifications.show("All files have been reset", { severity: "info" });
   }, [codeEditorRef, notifications]);
 
+  const handleDelete = useCallback(async () => {
+    await deleteSubmission({ problemId: problem.id });
+    notifications.show("Submission deleted", { severity: "info" });
+  }, [problem.id, notifications, deleteSubmission]);
+
   return (
     <div className="flex justify-between items-center mb-2">
       <Breadcrumbs>
@@ -128,25 +140,52 @@ const ProblemHeader = ({
         <Typography variant="body2">{problem.title}</Typography>
       </Breadcrumbs>
       <div className="flex gap-2">
-        {submission.data && (
-          <Button
-            loading={submission.isPending}
-            size="small"
-            onClick={loadLastSubmission}
-          >
-            Load Last Saved
-          </Button>
-        )}
-        <Button
-          loading={setSubmissionPending}
-          size="small"
-          onClick={handleSave}
-        >
-          Save
-        </Button>
-        <Button size="small" onClick={handleReset}>
-          Reset
-        </Button>
+        <div className="flex gap-2 mr-2">
+          <ButtonGroup>
+            {submission.data?.exists && (
+              <Button
+                loading={submission.isPending}
+                size="small"
+                variant="outlined"
+                onClick={loadLastSubmission}
+                endIcon={<SkipPreviousIcon fontSize="small" />}
+              >
+                Load
+              </Button>
+            )}
+            <Button
+              loading={setSubmissionPending}
+              size="small"
+              variant="outlined"
+              onClick={handleSave}
+              endIcon={<SaveIcon fontSize="small" />}
+            >
+              Save
+            </Button>
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={handleReset}
+              endIcon={<SettingsBackupRestoreIcon fontSize="small" />}
+            >
+              Reset
+            </Button>
+
+            {submission.data?.exists && (
+              <Button
+                loading={deleteSubmissionPending}
+                size="small"
+                onClick={handleDelete}
+                variant="outlined"
+                color="error"
+                endIcon={<DeleteIcon fontSize="small" />}
+              >
+                Delete
+              </Button>
+            )}
+          </ButtonGroup>
+        </div>
+
         <Button
           variant="outlined"
           onClick={setCompleted}
@@ -178,8 +217,8 @@ const Problem = ({ id }: { id: string }) => {
   const notifications = useNotifications();
 
   const loadLastSubmission = useCallback(() => {
-    if (submission.data) {
-      codeEditorRef.current?.updateFiles(submission.data);
+    if (submission.data?.exists) {
+      codeEditorRef.current?.updateFiles(submission.data.data);
       notifications.show("Last submission loaded", { severity: "info" });
     }
   }, [submission.data, codeEditorRef, notifications]);
