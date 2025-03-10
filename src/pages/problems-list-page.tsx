@@ -105,7 +105,7 @@ export const ProblemsListPage = () => {
   }
 
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="lg" className="!ml-0">
       <div className="flex flex-row justify-between items-center">
         <Typography variant={"h5"}>{category} Problems</Typography>
         <div className="flex items-center gap-2">
