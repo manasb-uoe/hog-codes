@@ -61,16 +61,16 @@ export const AuthContextProvider = ({
     setShowLogin(false);
   }, []);
 
+  if (showLogin) {
+    return <LoginForm auth={auth} onSuccess={onLoginSuccess} />;
+  }
+
   if (loading || user.isPending) {
     return (
       <div className="flex items-center justify-center h-full">
         <CircularProgress />
       </div>
     );
-  }
-
-  if (showLogin) {
-    return <LoginForm auth={auth} onSuccess={onLoginSuccess} />;
   }
 
   return (
