@@ -43,12 +43,13 @@ export const ProblemsListPage = () => {
         cellClassName: "flex items-center",
         renderCell: (params) => {
           return (
-            <Link underline="hover">
+            <Link underline="hover" component={"div"}>
               <RouterLink to={params.row.id}>
                 <Typography
                   className="cursor-pointer"
                   variant="body1"
-                  fontWeight={600}
+                  fontSize={16}
+                  fontWeight={400}
                 >
                   {params.value}
                 </Typography>
@@ -102,7 +103,7 @@ export const ProblemsListPage = () => {
   }
 
   return (
-    <Container maxWidth="md">
+    <Container maxWidth="lg">
       <div className="flex flex-row justify-between items-center">
         <Typography variant={"h5"}>{category} Problems</Typography>
         <div className="flex items-center gap-2">
