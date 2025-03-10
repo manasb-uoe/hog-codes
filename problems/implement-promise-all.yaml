@@ -1,0 +1,51 @@
+title: Implement Promise.all()
+description: |
+  The `Promise.all()` method takes an iterable of promises as an input, and returns a single Promise that resolves to an array of the results of the input promises.
+
+  &nbsp;
+
+  You can read more on [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all).
+category: JavaScript
+tags: [promise]
+difficulty: medium
+files:
+  - name: index.js
+    content: |
+      /**
+      * @param {Array<any>} promises - notice input might have non-Promises
+      * @return {Promise<any[]>}
+      */
+      export function all(promises) {
+        // your code here
+      }
+
+  - name: index.test.js
+    content: |
+      import { all } from "/index.js";
+
+      test("resolves all promises", async () => {
+        const promises = [Promise.resolve(1), Promise.resolve(2), Promise.resolve(3)];
+        await expect(all(promises)).resolves.toEqual([1, 2, 3]);
+      });
+
+      test("rejects if any promise rejects", async () => {
+        const promises = [Promise.resolve(1), Promise.reject(new Error("fail")), Promise.resolve(3)];
+        await expect(all(promises)).rejects.toThrow("fail");
+      });
+
+      test("works with an empty array", async () => {
+        await expect(all([])).resolves.toEqual([]);
+      });
+
+      test("handles non-promise values", async () => {
+        const values = [1, "string", true, Promise.resolve(4)];
+        await expect(all(values)).resolves.toEqual([1, "string", true, 4]);
+      });
+
+      test("rejects immediately if the first promise rejects", async () => {
+        const promises = [
+          Promise.reject(new Error("early reject")),
+          new Promise((resolve) => setTimeout(() => resolve(2), 100)),
+        ];
+        await expect(all(promises)).rejects.toThrow("early reject");
+      });
