@@ -17,7 +17,7 @@ files:
     content: |
       /**
       * @param {HTMLElement} rootA
-      * @param {HTMLElement} rootB - rootA and rootB are clone of each other
+      * @param {HTMLElement} rootB 
       * @param {HTMLElement} nodeA
       */
       export const findCorrespondingNode = (rootA, rootB, target) => {

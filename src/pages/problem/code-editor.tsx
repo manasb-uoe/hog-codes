@@ -167,8 +167,8 @@ export function CodeEditor({
               Console
             </Typography>
             <Typography color="info" variant="body2">
-              Use <strong>Command + Enter</strong> to execute tests when not in
-              Watch mode
+              Use <strong>Ctrl/Command + Enter</strong> to execute tests when
+              not in Watch mode
             </Typography>
           </div>
           <SandpackConsole
