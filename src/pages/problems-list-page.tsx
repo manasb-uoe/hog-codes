@@ -83,7 +83,7 @@ export const ProblemsListPage = () => {
     const randomProblem =
       problems.data[Math.floor(Math.random() * problems.data.length)];
     navigate(`/problems/${category}/${randomProblem.id}`);
-  }, [problems.data, category]);
+  }, [problems.data, category, navigate]);
 
   if (problems.isPending) {
     return <CircularProgress size={"small"} />;
