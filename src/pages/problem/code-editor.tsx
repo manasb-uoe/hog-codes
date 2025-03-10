@@ -6,7 +6,7 @@ import {
   useSandpack,
 } from "@codesandbox/sandpack-react";
 import { Editor, OnMount } from "@monaco-editor/react";
-import { Typography, useTheme } from "@mui/material";
+import { Button, Typography, useTheme } from "@mui/material";
 import { KeyCode, KeyMod } from "monaco-editor";
 import {
   Ref,
@@ -166,10 +166,20 @@ export function CodeEditor({
             >
               Console
             </Typography>
-            <Typography color="info" variant="body2">
-              Use <strong>Ctrl/Command + Enter</strong> to execute tests when
-              not in Watch mode
-            </Typography>
+            <div className="flex items-center gap-2">
+              <Typography color="info" variant="body2">
+                Use <strong>Ctrl/Cmd + Enter</strong> to execute tests when not
+                in Watch mode
+              </Typography>
+              <Button
+                onClick={() => dispatch({ type: "run-all-tests" })}
+                size="small"
+                color="info"
+                variant="outlined"
+              >
+                Run Tests
+              </Button>
+            </div>
           </div>
           <SandpackConsole
             showResetConsoleButton
