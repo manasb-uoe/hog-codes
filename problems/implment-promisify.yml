@@ -35,7 +35,7 @@ description: |
   })
   ```
 category: JavaScript
-tags: []
+tags: [promise]
 difficulty: easy
 files:
   - name: index.js

@@ -275,7 +275,7 @@ const Problem = ({ id }: { id: string }) => {
                   borderColor: "var(--sp-colors-surface2)",
                 }}
               >
-                <SandpackTests watchMode={false} className="h-full" />
+                <SandpackTests watchMode={false} className="h-full" verbose />
               </Panel>
             </PanelGroup>
           </Panel>

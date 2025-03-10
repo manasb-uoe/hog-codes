@@ -1,0 +1,92 @@
+title: Find corresponding node in two isomorphic DOM trees
+description: |
+  Given two isomorphic DOM trees **A** and **B**, and a target element **a** in **A**, find the corresponding element **b** in **B**. By **corresponding**, we mean **a** and **b** have the same relative position in both trees. 
+
+  &nbsp;
+
+  Two trees are isomorphic if they have the same structure—that is, the same shape and arrangement of nodes—but the values stored in the nodes can be different.
+
+  &nbsp;
+
+  Can you solve this iteratively and recursively?
+category: JavaScript
+tags: [tree]
+difficulty: easy
+files:
+  - name: index.js
+    content: |
+      /**
+      * @param {HTMLElement} rootA
+      * @param {HTMLElement} rootB - rootA and rootB are clone of each other
+      * @param {HTMLElement} nodeA
+      */
+      export const findCorrespondingNode = (rootA, rootB, target) => {
+        // your code here
+      }
+
+  - name: index.test.js
+    content: |
+      import { findCorrespondingNode } from "./index";
+
+      test("Finds corresponding node in an isomorphic DOM tree", () => {
+        document.body.innerHTML = `
+          <div id="rootA">
+            <div class="child1">
+              <span class="subchild"></span>
+            </div>
+            <div class="child2"></div>
+          </div>
+          <div id="rootB">
+            <div class="child1">
+              <span class="subchild"></span>
+            </div>
+            <div class="child2"></div>
+          </div>
+        `;
+
+        const rootA = document.getElementById("rootA");
+        const rootB = document.getElementById("rootB");
+        const target = rootA.querySelector(".subchild");
+        const result = findCorrespondingNode(rootA, rootB, target);
+        const expected = rootB.querySelector(".subchild");
+
+        expect(result).toBe(expected);
+      });
+
+      test("Returns rootB when target is rootA", () => {
+        document.body.innerHTML = `
+          <div id="rootA"></div>
+          <div id="rootB"></div>
+        `;
+
+        const rootA = document.getElementById("rootA");
+        const rootB = document.getElementById("rootB");
+
+        expect(findCorrespondingNode(rootA, rootB, rootA)).toBe(rootB);
+      });
+
+      test("Handles deeper nested structures", () => {
+        document.body.innerHTML = `
+          <div id="rootA">
+            <div>
+              <div>
+                <div id="target"></div>
+              </div>
+            </div>
+          </div>
+          <div id="rootB">
+            <div>
+              <div>
+                <div id="expected"></div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        const rootA = document.getElementById("rootA");
+        const rootB = document.getElementById("rootB");
+        const target = document.getElementById("target");
+        const expected = document.getElementById("expected");
+
+        expect(findCorrespondingNode(rootA, rootB, target)).toBe(expected);
+      });
