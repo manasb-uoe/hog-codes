@@ -28,8 +28,9 @@ export const ProblemsListPage = () => {
         field: "status",
         headerName: "Status",
         cellClassName: "flex items-center",
+        valueGetter: (_, row) => user.completions[row.id],
         renderCell: (params) => {
-          if (user.completions[params.row.id]) {
+          if (params.value) {
             return <DoneAllIcon color="success" fontSize="small" />;
           } else {
             return <CodeIcon fontSize="small" />;
@@ -66,6 +67,7 @@ export const ProblemsListPage = () => {
       {
         field: "tags",
         headerName: "Tags",
+        valueGetter: (_, row) => row.tags.join(","),
         renderCell: (params) => {
           return params.row.tags.map((tag) => <TagChip key={tag} tag={tag} />);
         },
