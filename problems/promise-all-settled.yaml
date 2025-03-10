@@ -1,0 +1,56 @@
+title: Implement Promise.allSettled()
+description: |
+  The `Promise.allSettled()` method returns a promise that resolves after all of the given promises have either fulfilled or rejected, with an array of objects that each describes the outcome of each promise.
+
+  &nbsp;
+
+  You can read more on [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/allSettled).
+category: JavaScript
+tags: [promise]
+difficulty: medium
+files:
+  - name: index.js
+    content: |
+      /**
+      * @param {Array<any>} promises - notice that input might contains non-promises
+      * @return {Promise<Array<{status: 'fulfilled', value: any} | {status: 'rejected', reason: any}>>}
+      */
+      export function allSettled(promises) {
+        // your code here
+      }
+
+  - name: index.test.js
+    content: |
+      import { allSettled } from "./index.js";
+
+      test("resolves all promises with their statuses", async () => {
+        const promises = [Promise.resolve(1), Promise.reject(new Error("fail")), Promise.resolve(3)];
+        await expect(allSettled(promises)).resolves.toEqual([
+          { status: "fulfilled", value: 1 },
+          { status: "rejected", reason: expect.any(Error) },
+          { status: "fulfilled", value: 3 },
+        ]);
+      });
+
+      test("works with an empty array", async () => {
+        await expect(allSettled([])).resolves.toEqual([]);
+      });
+
+      test("handles non-promise values", async () => {
+        const values = [1, "string", true, Promise.resolve(4), Promise.reject("error")];
+        await expect(allSettled(values)).resolves.toEqual([
+          { status: "fulfilled", value: 1 },
+          { status: "fulfilled", value: "string" },
+          { status: "fulfilled", value: true },
+          { status: "fulfilled", value: 4 },
+          { status: "rejected", reason: "error" },
+        ]);
+      });
+
+      test("does not reject if any promise rejects", async () => {
+        const promises = [Promise.reject(new Error("failure")), Promise.resolve(2)];
+        await expect(allSettled(promises)).resolves.toEqual([
+          { status: "rejected", reason: expect.any(Error) },
+          { status: "fulfilled", value: 2 },
+        ]);
+      });
