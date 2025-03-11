@@ -1,5 +1,5 @@
 import { Chip } from "@mui/material";
-import { TProblemDifficulty } from "../types";
+import { TProblemDifficulty } from "../store/problems";
 
 export const DifficultyChip = ({
   difficulty,

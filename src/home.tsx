@@ -8,7 +8,7 @@ import {
   Typography,
 } from "@mui/material";
 import { Link } from "react-router";
-import { problemCategories } from "./types";
+import { problemCategories } from "./store/problems";
 
 export const Home = () => {
   return (

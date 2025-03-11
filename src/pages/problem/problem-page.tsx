@@ -32,7 +32,7 @@ import {
   useSetSubmission,
   useSetUser,
 } from "../../store/users";
-import { IProblem } from "../../types";
+import { IProblem } from "../../store/problems";
 import { CodeEditor, ICodeEditorRef } from "./code-editor";
 import { MarkdownRenderer } from "./markdown-renderer";
 

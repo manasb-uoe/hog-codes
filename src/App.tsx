@@ -12,7 +12,7 @@ import React, { useCallback } from "react";
 import { Link, Navigate, Route, Routes } from "react-router";
 import { useAuthContext } from "./auth/auth-context";
 import { ProblemsListPage } from "./pages/problems-list-page";
-import { problemCategories } from "./types";
+import { problemCategories } from "./store/problems";
 import { ProblemPage } from "./pages/problem/problem-page";
 
 function App() {

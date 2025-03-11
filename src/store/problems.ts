@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import {
+import Firestore, {
   collection,
   doc,
   getDoc,
@@ -7,8 +7,34 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import { IProblem, IProblemCategory } from "../types";
 import { useDbContext } from "./db-context";
+
+export interface ITestCase {
+  id: string;
+  description: string;
+  spec: string;
+}
+
+export interface IFile {
+  name: string;
+  content: string;
+}
+
+export interface IProblem {
+  id: string;
+  title: string;
+  description: string;
+  category: IProblemCategory;
+  tags: string[];
+  difficulty: TProblemDifficulty;
+  createdAt: Firestore.Timestamp;
+  files: IFile[];
+}
+export type TProblemDifficulty = "easy" | "medium" | "hard";
+
+export const problemCategories = ["JavaScript", "React"] as const;
+
+export type IProblemCategory = (typeof problemCategories)[number];
 
 export const queryKeys = {
   problems: {
