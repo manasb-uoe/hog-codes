@@ -101,7 +101,7 @@ export const ProblemsListPage = () => {
     if (difficultyFilter !== "all") {
       params["difficulty"] = difficultyFilter;
     }
-    setSearchParams(params);
+    setSearchParams(params, { replace: true });
   }, [difficultyFilter, solvedStatusFilter, setSearchParams]);
 
   const navigate = useNavigate();
