@@ -1,5 +1,7 @@
 import { AccountCircle } from "@mui/icons-material";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
 import SavingsIcon from "@mui/icons-material/Savings";
+import WbSunnyIcon from "@mui/icons-material/WbSunny";
 import {
   AppBar,
   IconButton,
@@ -8,12 +10,13 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
-import React, { useCallback } from "react";
+import React, { useCallback, useContext } from "react";
 import { Link, Navigate, Route, Routes } from "react-router";
 import { useAuthContext } from "./auth/auth-context";
+import { ProblemPage } from "./pages/problem/problem-page";
 import { ProblemsListPage } from "./pages/problems-list-page";
 import { problemCategories } from "./store/problems";
-import { ProblemPage } from "./pages/problem/problem-page";
+import { AppThemeContext } from "./theme-context";
 
 function App() {
   const authContext = useAuthContext();
@@ -21,6 +24,8 @@ function App() {
   const handleUserMenuClose = useCallback(() => {
     setAnchorEl(null);
   }, []);
+
+  const appTheme = useContext(AppThemeContext);
 
   return (
     <div className="flex flex-col h-full">
@@ -53,6 +58,21 @@ function App() {
             </div>
           </div>
           <div>
+            <IconButton
+              size="small"
+              color="inherit"
+              onClick={() =>
+                appTheme.setColorScheme(
+                  appTheme.colorScheme === "dark" ? "light" : "dark"
+                )
+              }
+            >
+              {appTheme.colorScheme === "light" ? (
+                <WbSunnyIcon fontSize="small" />
+              ) : (
+                <DarkModeIcon fontSize="small" />
+              )}
+            </IconButton>
             <IconButton
               size="small"
               aria-label="account of current user"

@@ -4,13 +4,14 @@ import { NotificationsProvider } from "@toolpad/core/useNotifications";
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
 import App from "./app.tsx";
 import { AuthContextProvider } from "./auth/auth-context.tsx";
 import "./index.css";
 import { DbContext } from "./store/db-context.ts";
+import { AppThemeContext, TThemeContext } from "./theme-context.tsx";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD8a0jdTXuOGO6xb1B7Hg-UA4lT5NxqXWs",
@@ -33,7 +34,7 @@ const queryClient = new QueryClient({
 export const ThemeWrapper = ({
   children,
 }: React.PropsWithChildren<unknown>) => {
-  const [colorScheme, setColorScheme] = useState<"light" | "dark">(
+  const [colorScheme, setColorScheme] = useState<TThemeContext["colorScheme"]>(
     window.matchMedia?.("(prefers-color-scheme: dark)").matches
       ? "dark"
       : "light"
@@ -55,7 +56,17 @@ export const ThemeWrapper = ({
       );
   }, []);
 
-  return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
+  const themeContext = useMemo<TThemeContext>(() => {
+    return { colorScheme, setColorScheme };
+  }, [colorScheme, setColorScheme]);
+
+  return (
+    <ThemeProvider theme={theme}>
+      <AppThemeContext.Provider value={themeContext}>
+        {children}
+      </AppThemeContext.Provider>
+    </ThemeProvider>
+  );
 };
 
 createRoot(document.getElementById("root")!).render(
