@@ -16,6 +16,7 @@ import {
   ButtonGroup,
   CircularProgress,
   Typography,
+  useTheme,
 } from "@mui/material";
 import { useNotifications } from "@toolpad/core/useNotifications";
 import classNames from "classnames";
@@ -25,14 +26,13 @@ import { Link, useParams } from "react-router";
 import { useAuthContext } from "../../auth/auth-context";
 import { DifficultyChip } from "../../components/difficulty-chip";
 import { TagChip } from "../../components/tag-chip";
-import { useGetProblem } from "../../store/problems";
+import { IProblem, useGetProblem } from "../../store/problems";
 import {
   useDeleteSubmission,
   useGetSubmission,
   useSetSubmission,
   useSetUser,
 } from "../../store/users";
-import { IProblem } from "../../store/problems";
 import { CodeEditor, ICodeEditorRef } from "./code-editor";
 import { MarkdownRenderer } from "./markdown-renderer";
 
@@ -227,6 +227,8 @@ const Problem = ({ id }: { id: string }) => {
     loadLastSubmission();
   }, [loadLastSubmission]);
 
+  const theme = useTheme();
+
   if (problem.isPending) {
     return <CircularProgress size={"small"} />;
   }
@@ -248,7 +250,7 @@ const Problem = ({ id }: { id: string }) => {
   return (
     <SandpackProvider
       className="!h-full"
-      theme={"auto"}
+      theme={theme.palette.mode}
       template="vanilla"
       files={files}
     >
