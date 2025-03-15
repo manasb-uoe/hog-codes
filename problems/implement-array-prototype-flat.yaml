@@ -1,0 +1,53 @@
+title: Implement Array.prototype.flat()
+description: |
+  Implement `Array.prototype.flat()` which takes an array of arrays and returns a new array with all values flattened.
+
+  &nbsp;
+
+  You can read more on [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flat).
+category: JavaScript
+tags: [array]
+difficulty: easy
+files:
+  - name: index.js
+    content: |
+      /**
+      * @param { Array } arr
+      * @param { number } depth
+      * @returns { Array }
+      */
+      export function flat(arr, depth = 1) {
+        // your code goes here
+      }
+
+  - name: index.test.js
+    content: |
+      import { flat } from "./index.js";
+
+      test("flattens a nested array with default depth of 1", () => {
+        expect(flat([1, [2, 3], [4, [5, 6]]])).toEqual([1, 2, 3, 4, [5, 6]]);
+      });
+
+      test("flattens a nested array with specified depth of 2", () => {
+        expect(flat([1, [2, 3], [4, [5, 6]]], 2)).toEqual([1, 2, 3, 4, 5, 6]);
+      });
+
+      test("returns an empty array when given an empty array", () => {
+        expect(flat([])).toEqual([]);
+      });
+
+      test("returns the same array if there is no nesting", () => {
+        expect(flat([1, 2, 3])).toEqual([1, 2, 3]);
+      });
+
+      test("flattens deeply nested arrays when depth is sufficient", () => {
+        expect(flat([1, [2, [3, [4, 5]]]], 3)).toEqual([1, 2, 3, 4, 5]);
+      });
+
+      test("handles arrays with different types of values", () => {
+        expect(flat([1, ["a", [true, null], 3], 4], 2)).toEqual([1, "a", true, null, 3, 4]);
+      });
+
+      test("flattens completely when depth is Infinity", () => {
+        expect(flat([1, [2, [3, [4, [5]]]]], Infinity)).toEqual([1, 2, 3, 4, 5]);
+      });
