@@ -45,7 +45,9 @@ const ProblemDescription = ({
 }) => {
   return (
     <div className={classNames("flex flex-col gap-1 h-full", className)}>
-      <Typography variant="h6">{problem.title}</Typography>
+      <Typography color="textPrimary" variant="h6">
+        {problem.title}
+      </Typography>
       <div className="flex gap-2">
         <DifficultyChip difficulty={problem.difficulty} />
         {problem.tags.map((tag) => (

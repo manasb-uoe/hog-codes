@@ -62,6 +62,7 @@ export const ThemeWrapper = ({
 
   return (
     <ThemeProvider theme={theme}>
+      <CssBaseline />
       <AppThemeContext.Provider value={themeContext}>
         {children}
       </AppThemeContext.Provider>
@@ -80,7 +81,6 @@ createRoot(document.getElementById("root")!).render(
           },
         }}
       >
-        <CssBaseline />
         <BrowserRouter>
           <DbContext.Provider value={db}>
             <AuthContextProvider auth={auth}>

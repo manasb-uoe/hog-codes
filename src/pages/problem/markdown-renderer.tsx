@@ -15,12 +15,16 @@ export const MarkdownRenderer = ({
       components={{
         ol: ({ children, ...props }) => (
           <ol className="list-decimal list-inside" {...props}>
-            <Typography variant="body1">{children}</Typography>
+            <Typography color="textPrimary" variant="body1">
+              {children}
+            </Typography>
           </ol>
         ),
         ul: ({ children, ...props }) => (
           <ul className="list-disc list-inside" {...props}>
-            <Typography variant="body1">{children}</Typography>
+            <Typography color="textPrimary" variant="body1">
+              {children}
+            </Typography>
           </ul>
         ),
         a: ({ children, ...props }) => (
@@ -29,7 +33,7 @@ export const MarkdownRenderer = ({
           </Link>
         ),
         p: ({ children }) => (
-          <Typography variant="body1" color="">
+          <Typography color="textPrimary" variant="body1">
             {children}
           </Typography>
         ),
