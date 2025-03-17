@@ -13,7 +13,8 @@ A [Firebase](http://firebase.google.com/) powered Leetcode clone. Wanted to lear
 https://hog-codes.web.app
 
 <div style="display: flex; flex-direction: row;">
-  Screenshots coming soon...
+  <img src="https://github.com/manasb-uoe/hog-eats/blob/main/screenshots/screenshot-1.png?raw=true" alt="app logo" width="300";"/>
+  <img src="https://github.com/manasb-uoe/hog-eats/blob/main/screenshots/screenshot-2.png?raw=true" alt="app logo" width="300"/>
 </div>
 </div>
 
