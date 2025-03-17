@@ -24,7 +24,6 @@ function App() {
   const handleUserMenuClose = useCallback(() => {
     setAnchorEl(null);
   }, []);
-
   const appTheme = useContext(AppThemeContext);
 
   return (
