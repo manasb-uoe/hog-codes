@@ -1,0 +1,94 @@
+title: Implement _.set()
+description: |
+  [_.set(object, path, value)](https://lodash.com/docs/4.17.15#set) is a handy method to updating an object without checking the property existence.
+
+  &nbsp;
+
+  Can you create your own `set()`?
+
+  ```javascript
+  set(obj, 'a.b.c', 'BFE')
+  console.log(obj.a.b.c) // "BFE"
+
+  set(obj, 'a.b.c.0', 'BFE')
+  console.log(obj.a.b.c[0]) // "BFE"
+
+  set(obj, 'a.b.c[1]', 'BFE')
+  console.log(obj.a.b.c[1]) // "BFE"
+
+  set(obj, ['a', 'b', 'c', '2'], 'BFE')
+  console.log(obj.a.b.c[2]) // "BFE"
+
+  set(obj, 'a.b.c[3]', 'BFE')
+  console.log(obj.a.b.c[3]) // "BFE"
+
+  set(obj, 'a.c.d[0]', 'BFE')
+  // valid digits treated as array elements
+  console.log(obj.a.c.d[0]) // "BFE"
+
+  set(obj, 'a.c.d.01', 'BFE')
+  // invalid digits treated as property string
+  console.log(obj.a.c.d['01']) // "BFE"
+  ```
+category: JavaScript
+tags: [lodash]
+difficulty: medium
+files:
+  - name: index.js
+    content: |
+      /**
+      * @param {object} obj
+      * @param {string | string[]} path
+      * @param {any} value
+      */
+      export function set(obj, path, value) {
+        // your code here
+      }
+
+  - name: index.test.js
+    content: |
+      import { set } from './index.js';
+
+      // Ensure object property is correctly set
+      test('sets nested object properties', () => {
+        let obj = {};
+        set(obj, 'a.b.c', 'BFE');
+        expect(obj.a.b.c).toBe('BFE');
+      });
+
+      // Ensure array indices are correctly handled
+      test('sets array elements when using valid indices', () => {
+        let obj = {};
+        set(obj, 'a.b.c[0]', 'BFE');
+        expect(obj.a.b.c[0]).toBe('BFE');
+
+        set(obj, 'a.b.c[1]', 'BFE');
+        expect(obj.a.b.c[1]).toBe('BFE');
+      });
+
+      // Ensure array indices work with path as an array
+      test('sets array elements with array path input', () => {
+        let obj = {};
+        set(obj, ['a', 'b', 'c', '2'], 'BFE');
+        expect(obj.a.b.c[2]).toBe('BFE');
+      });
+
+      // Ensure numeric strings as keys are handled correctly
+      test('treats numeric keys as properties if not valid array indices', () => {
+        let obj = {};
+        set(obj, 'a.c.d.01', 'BFE');
+        expect(obj.a.c.d['01']).toBe('BFE');
+      });
+
+      // Ensure it creates nested objects and arrays as needed
+      test('creates objects and arrays dynamically', () => {
+        let obj = {};
+        set(obj, 'x.y.z[0]', 'test');
+        expect(obj.x.y.z[0]).toBe('test');
+        
+        set(obj, 'x.y.z[1]', 'test2');
+        expect(obj.x.y.z[1]).toBe('test2');
+        
+        set(obj, 'x.y.v', 'test3');
+        expect(obj.x.y.v).toBe('test3');
+      });
